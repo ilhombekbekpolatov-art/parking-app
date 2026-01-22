@@ -2,15 +2,8 @@ package com.smart.parking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -18,56 +11,29 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-@Table(name = "car")
+@Table(name = "cars")
 public class Car {
 
-    @Id
-    @GeneratedValue
-    private Long id;
 
-    @Column(nullable = false, name = "car_name")
-    private String carName;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(name = "number_plate", nullable = false, unique = true)
-    private String numberPlate;
+        private String carName;
 
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = Boolean.FALSE;
+        @Column(unique = true)
+        private String numberPlate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+        private Boolean isDeleted = false;
 
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "user_id", nullable = false)
+        private User user;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "car_parking",
-            joinColumns = @JoinColumn(name = "car_id"),
-            inverseJoinColumns = @JoinColumn(name = "parking_id")
-    )
-    private Set<Parking> parkingPlaces = new HashSet<>();
-
-    @CreatedDate
-    @Column(
-            nullable = false,
-            updatable = false
-    )
-    private LocalDateTime createDate;
-
-    @LastModifiedDate
-    @Column(insertable = false)
-    private LocalDateTime lastModified;
+        @ManyToOne
+        @JoinColumn(name = "parking_id")
+        private Parking parking;
 
 
-    @CreatedBy
-    @Column(
-            nullable = false,
-            updatable = false
-    )
-    private Long createdBy;
-
-    @LastModifiedBy
-    @Column(insertable = false)
-    private Long lastModifiedBy;
-}
+    private LocalDateTime createdAt = LocalDateTime.now();
+    }

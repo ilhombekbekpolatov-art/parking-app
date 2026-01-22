@@ -10,7 +10,6 @@ import com.smart.parking.exception.NotFoundException;
 import com.smart.parking.repository.CarRepository;
 import com.smart.parking.repository.ParkingRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +31,7 @@ public class CarServiceImpl implements CarService {
                 .id(request.getId())
                 .carName(request.getCarName())
                 .numberPlate(request.getNumberPlate())
-                .user(user)
+
                 .build();
         repository.save(car);
     }
@@ -66,24 +65,33 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarGetRequest> userCars(Long userId) {
+
         List<Car> cars = repository.findByUserId(userId, false);
         List<CarGetRequest> carRequests = new ArrayList<>();
 
         for (Car car : cars) {
+
             Set<ParkingRequest> parkingRequests = new HashSet<>();
-            for (Parking parkingPlace : car.getParkingPlaces()) {
-                parkingRequests.add(new ParkingRequest(parkingPlace.getParkingName()));
+
+            if (car.getParking() != null) {
+                parkingRequests.add(
+                        new ParkingRequest(car.getParking().getParkingName())
+                );
             }
-            CarGetRequest build = CarGetRequest.builder()
+
+            CarGetRequest response = CarGetRequest.builder()
                     .id(car.getId())
                     .carName(car.getCarName())
                     .numberPlate(car.getNumberPlate())
                     .parking(parkingRequests)
                     .build();
-            carRequests.add(build);
+
+            carRequests.add(response);
         }
+
         return carRequests;
     }
+
 
     @Override
     public CarGetRequest findCarById(Long carId) {
@@ -118,7 +126,6 @@ public class CarServiceImpl implements CarService {
         for (ParkingRequest parkingEntity : carRequest.getParking()) {
             Parking parkingPlace = Parking.builder()
                     .parkingName(parkingEntity.getParkingName())
-                    .user(user)
                     .parkedCars(cars)
                     .isDeleted(false)
                     .build();
@@ -128,7 +135,7 @@ public class CarServiceImpl implements CarService {
             parkingPlaceRepository.save(parkingPlace);
         }
 
-        car.setParkingPlaces(parkingPlaces);
+        car.setParking((Parking) parkingPlaces);
         repository.save(car);
     }
 

@@ -2,87 +2,52 @@ package com.smart.parking.entity;
 
 import com.smart.parking.entity.constants.Role;
 import jakarta.persistence.*;
-
-import java.util.Collection;
-import java.util.List;
-
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 public class User implements UserDetails {
 
-    @Id
-    @GeneratedValue
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(name = "first_name")
-    private String firstname;
+        private String firstname;
+        private String lastname;
 
-    @Column(name = "last_name")
-    private String lastname;
+        @Column(unique = true, nullable = false)
+        private String phoneNumber;
 
-    @Column(name = "phone_number", unique = true)
-    private String phoneNumber;
+        @Column(nullable = false)
+        private String password;
 
-    @Column(name = "password")
-    private String password;
+        private Boolean isDeleted = false;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = Boolean.FALSE;
+        @Enumerated(EnumType.STRING)
+        private Role role;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+        private List<Token> tokens;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<Car> cars;
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<ParkingPlace> parkingPlaces;
+        private Boolean isNonLocked = true;
 
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
+        @Override
+        public Collection<? extends GrantedAuthority> getAuthorities() {
+            return role.getAuthorities();
+        }
 
-    private Boolean isNonLocked = Boolean.TRUE;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return role.getAuthorities();
+        @Override public String getUsername() { return phoneNumber; }
+        @Override public boolean isAccountNonExpired() { return true; }
+        @Override public boolean isAccountNonLocked() { return isNonLocked; }
+        @Override public boolean isCredentialsNonExpired() { return true; }
+        @Override public boolean isEnabled() { return true; }
     }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return phoneNumber;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return isNonLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-}

@@ -22,23 +22,37 @@ public class SecurityApplication {
     @Bean
     public CommandLineRunner commandLineRunner(AuthenticationService service) {
         return args -> {
-            var admin = RegisterRequest.builder()
-                    .firstname("Admin")
-                    .lastname("Admin")
-                    .phoneNumber("admin@mail.com")
-                    .password("password")
-                    .role(ADMIN)
-                    .build();
-            System.out.println("Admin token: " + service.register(admin).getAccessToken());
+            try {
+                var admin = RegisterRequest.builder()
+                        .firstname("Admin")
+                        .lastname("Admin")
+                        .phoneNumber("admin@mail.com")
+                        .password("password")
+                        .role(ADMIN)
+                        .build();
 
-            var manager = RegisterRequest.builder()
-                    .firstname("Admin")
-                    .lastname("Admin")
-                    .phoneNumber("manager@mail.com")
-                    .password("password")
-                    .role(MANAGER)
-                    .build();
-            System.out.println("Manager token: " + service.register(manager).getAccessToken());
+                System.out.println("Admin token: " +
+                        service.register(admin).getAccessToken());
+
+            } catch (Exception e) {
+                System.out.println("Admin allaqachon mavjud");
+            }
+
+            try {
+                var manager = RegisterRequest.builder()
+                        .firstname("Manager")
+                        .lastname("Manager")
+                        .phoneNumber("manager@mail.com")
+                        .password("password")
+                        .role(MANAGER)
+                        .build();
+
+                System.out.println("Manager token: " +
+                        service.register(manager).getAccessToken());
+
+            } catch (Exception e) {
+                System.out.println("Manager allaqachon mavjud");
+            }
         };
     }
 }

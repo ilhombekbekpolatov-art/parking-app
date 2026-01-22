@@ -12,7 +12,6 @@ import com.smart.parking.exception.NotFoundException;
 import com.smart.parking.repository.CarRepository;
 import com.smart.parking.repository.ParkingRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -35,9 +34,8 @@ public class ParkingServiceImpl implements ParkingService {
                 Car carEntity = Car.builder()
                         .carName(car.getCarName())
                         .numberPlate(car.getNumberPlate())
-                        .user(user)
                         .isDeleted(false)
-                        .parkingPlaces(new HashSet<>(Collections.singleton(parkingEntity.get())))
+                        .parking(new Parking())
                         .build();
                 cars.add(carRepository.save(carEntity));
             }
